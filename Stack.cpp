@@ -18,6 +18,7 @@ stack_type StackPop(Stack * st);
 void StackMul(Stack * st);
 void StackSub(Stack * st);
 void StackDiv(Stack * st);
+void StackPrint(Stack * st);
 
 enum Error_list
     {
@@ -38,33 +39,37 @@ int main()
 
         scanf("%lf", &push_value);
         StackPush(&a, push_value);
-        StackDamp(&a);
+        StackPrint(&a);
 
         scanf("%lf", &push_value);
         StackPush(&a, push_value);
-        StackDamp(&a);
+        StackPrint(&a);
 
         scanf("%lf", &push_value);
         StackPush(&a, push_value);
-        StackDamp(&a);
+        StackPrint(&a);
 
         scanf("%lf", &push_value);
         StackPush(&a, push_value);
-        StackDamp(&a);
+        StackPrint(&a);
 
         scanf("%lf", &push_value);
         StackPush(&a, push_value);
-        StackDamp(&a);
+        StackPrint(&a);
 
-        StackDamp(&a);
+        StackPrint(&a);
         poped_value = StackPop(&a);
         printf("Poped value = %.3lf\n", poped_value);
-        StackDamp(&a);
+        StackPrint(&a);
 
         StackMul(&a);
-        StackDamp(&a);
+        StackPrint(&a);
 
         StackSub(&a);
+        StackPrint(&a);
+
+        StackDiv(&a);
+        StackPrint(&a);
         StackDamp(&a);
 
 
@@ -122,19 +127,29 @@ stack_type StackPop(Stack * st)
 
 void StackDamp(Stack * st)
     {
-        printf("\nStack info\n");
-        printf("Stack size = %d\n\n", st->size);
 
-        for(int i = 0; i < stack_size; i++)
+        FILE *f;
+        f = fopen("log.txt", "a+"); // a+ (create + append) option will allow appending which is useful in a log file
+        if (f == NULL)
             {
-                if(i == stack_size-1)
-                    {
-                        printf("data[%d] = %.3lf\n\n", i, st->data[i]);
-                    }
-                else
-                    {
-                        printf("data[%d] = %.3lf\n", i, st->data[i]);
-                    }
+                printf("ERROR: log file cannot be open");
+            }
+        else
+            {
+                fprintf(f, "\nStack info\n");
+                fprintf(f, "Stack size = %d\n\n", st->size);
+
+                for(int i = 0; i < stack_size; i++)
+                {
+                    if(i == stack_size-1)
+                        {
+                            fprintf(f, "data[%d] = %.3lf\n\n", i, st->data[i]);
+                        }
+                    else
+                        {
+                            fprintf(f, "data[%d] = %.3lf\n", i, st->data[i]);
+                        }
+                }
             }
     }
 
@@ -157,6 +172,21 @@ void StackDiv(Stack * st)
         st->data[st->size - 2] = (st->data[st->size - 2]) / (st->data[st->size - 1]);
         st->data[st->size - 1] = 0;
         st->size--;
+    }
+
+void StackPrint(Stack * st)
+    {
+        for(int i = 0; i < stack_size; i++)
+            {
+                if(i == stack_size-1)
+                    {
+                        printf("data[%d] = %.3lf\n\n", i, st->data[i]);
+                    }
+                else
+                    {
+                        printf("data[%d] = %.3lf\n", i, st->data[i]);
+                    }
+            }
     }
 
 
