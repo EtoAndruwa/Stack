@@ -10,7 +10,11 @@ typedef struct
 
 void StackInit(Stack * st);
 void StackPush(Stack * st, int push_value);
-int StackCheck(Stack * st);
+//int StackCheck(Stack * st);
+void StackDamp(Stack * st);
+int StackPop(Stack * st);
+void StackMul(Stack * st);
+void StackSub(Stack * st);
 
 enum Error_list
     {
@@ -25,17 +29,40 @@ int main()
     {
         Stack a;
         int push_value = 0;
+        int poped_value = 0;
 
         StackInit(&a);
 
         scanf("%d", &push_value);
         StackPush(&a, push_value);
+        StackDamp(&a);
 
         scanf("%d", &push_value);
         StackPush(&a, push_value);
+        StackDamp(&a);
 
         scanf("%d", &push_value);
         StackPush(&a, push_value);
+        StackDamp(&a);
+
+        scanf("%d", &push_value);
+        StackPush(&a, push_value);
+        StackDamp(&a);
+
+        scanf("%d", &push_value);
+        StackPush(&a, push_value);
+        StackDamp(&a);
+
+        StackDamp(&a);
+        poped_value = StackPop(&a);
+        printf("Poped value = %d\n", poped_value);
+        StackDamp(&a);
+
+        StackMul(&a);
+        StackDamp(&a);
+
+        StackSub(&a);
+        StackDamp(&a);
 
 
 
@@ -48,33 +75,36 @@ void StackInit(Stack * st)
         stack_size = 5;
         st->size = 0;
         st->data = (int *)calloc(stack_size, sizeof(int));
-        StackCheck(st);
+//        StackCheck(st);
     }
-//
+
 void StackPush(Stack * st, int push_value)
     {
-        StackCheck(st);
+//        StackCheck(st);
         st->data[st->size++] = push_value;
-        StackCheck(st);
+//        StackCheck(st);
     }
 
-//int StackPop(Stack * st)
-//    {
-//        st->data[st->size++] = push_value;
-//
-//    }
-
-int StackCheck(Stack * st)
+int StackPop(Stack * st)
     {
-        if(st->data == NULL)
-            {
-                return ERR_NULL_DATA;
-            }
-        else if(st->size >= 5)
-            {
-                return ERR_OUT_OF_STACK;
-            }
+        int temp = st->data[st->size - 1];
+        st->data[st->size - 1] = 0;
+        st->size--;
+        return temp;
+
     }
+
+//int StackCheck(Stack * st)
+//    {
+//        if(st->data == NULL)
+//            {
+//                return ERR_NULL_DATA;
+//            }
+//        else if(st->size >= 5)
+//            {
+//                return ERR_OUT_OF_STACK;
+//            }
+//    }
 //
 //void StackDetor(Stack * st)
 //    {
@@ -89,13 +119,34 @@ int StackCheck(Stack * st)
 
 void StackDamp(Stack * st)
     {
-        printf("Stack info\n");
-        printf("Stack size = %d\n\n", a.size);
+        printf("\nStack info\n");
+        printf("Stack size = %d\n\n", st->size);
 
         for(int i = 0; i < stack_size; i++)
             {
-                printf("data[%d] = %d\n", i, a.data[i]);
+                if(i == stack_size-1)
+                    {
+                        printf("data[%d] = %d\n\n", i, st->data[i]);
+                    }
+                else
+                    {
+                        printf("data[%d] = %d\n", i, st->data[i]);
+                    }
             }
+    }
+
+void StackMul(Stack * st)
+    {
+        st->data[st->size - 2] = st->data[st->size - 1] * st->data[st->size - 2];
+        st->data[st->size - 1] = 0;
+        st->size--;
+    }
+
+void StackSub(Stack * st)
+    {
+        st->data[st->size - 2] = st->data[st->size - 2] - st->data[st->size - 1];
+        st->data[st->size - 1] = 0;
+        st->size--;
     }
 
 
