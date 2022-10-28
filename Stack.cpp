@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef double stack_type;
 
 typedef struct
     {
         stack_type * data;
-        int size = 1;
+        int size = 0;
 
     }Stack;
 
@@ -19,12 +20,15 @@ void StackMul(Stack * st);
 void StackSub(Stack * st);
 void StackDiv(Stack * st);
 void StackPrint(Stack * st);
+void StackLogic(Stack * st, char command[], stack_type push_value);
+void StackAdd(Stack * st);
 
-enum Error_list
+enum error_list
     {
             ERR_NULL_DATA = 1,
             ERR_OUT_OF_STACK = 2
     };
+
 
 int stack_size = 0;
 int error_code = 0;
@@ -37,9 +41,16 @@ int main()
 
         StackInit(&a);
 
-        scanf("%lf", &push_value);
-        StackPush(&a, push_value);
         StackPrint(&a);
+
+        char command[4] = "";
+
+        scanf("%s %lf", &command, &push_value);
+
+        printf("Command: %s\n", command);
+        printf("Value = %.3lf\n", push_value);
+
+//        StackLogic(&a, command, push_value);
 
         scanf("%lf", &push_value);
         StackPush(&a, push_value);
@@ -49,28 +60,36 @@ int main()
         StackPush(&a, push_value);
         StackPrint(&a);
 
-        scanf("%lf", &push_value);
-        StackPush(&a, push_value);
+        StackAdd(&a);
         StackPrint(&a);
 
-        scanf("%lf", &push_value);
-        StackPush(&a, push_value);
-        StackPrint(&a);
+//
+//        scanf("%lf", &push_value);
+//        StackPush(&a, push_value);
+//        StackPrint(&a);
+//
+//        scanf("%lf", &push_value);
+//        StackPush(&a, push_value);
+//        StackPrint(&a);
+//
+//        scanf("%lf", &push_value);
+//        StackPush(&a, push_value);
+//        StackPrint(&a);
 
-        StackPrint(&a);
-        poped_value = StackPop(&a);
-        printf("Poped value = %.3lf\n", poped_value);
-        StackPrint(&a);
-
-        StackMul(&a);
-        StackPrint(&a);
-
-        StackSub(&a);
-        StackPrint(&a);
-
-        StackDiv(&a);
-        StackPrint(&a);
-        StackDamp(&a);
+//        StackPrint(&a);
+//        poped_value = StackPop(&a);
+//        printf("Poped value = %.3lf\n", poped_value);
+//        StackPrint(&a);
+//
+//        StackMul(&a);
+//        StackPrint(&a);
+//
+//        StackSub(&a);
+//        StackPrint(&a);
+//
+//        StackDiv(&a);
+//        StackPrint(&a);
+//        StackDamp(&a);
 
 
 
@@ -188,6 +207,26 @@ void StackPrint(Stack * st)
                     }
             }
     }
+
+void StackAdd(Stack * st)
+    {
+        st->data[st->size - 2] = (st->data[st->size - 2]) + (st->data[st->size - 1]);
+        st->data[st->size - 1] = 0;
+        st->size--;
+    }
+
+void StackLogic(Stack * st, char command[], stack_type push_value)
+    {
+        if(strcmp(command, "PUSH") == 1)
+            {
+                StackPush(st, push_value);
+            }
+        else if(strcmp(command, "POP") == 1)
+            {
+                StackPop(st);
+            }
+    }
+
 
 
 
