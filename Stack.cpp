@@ -45,23 +45,36 @@ int main()
 
         char command[4] = "";
 
-        scanf("%s %lf", &command, &push_value);
+//        const char *ñommand[6];
+//        command[0] = "PUSH";
+//        command[1] = "POP";
+//        command[2] = "ADD";
+//        command[3] = "SUB";
+//        command[4] = "MUL";
+//        command[5] = "DIV";
 
-        printf("Command: %s\n", command);
-        printf("Value = %.3lf\n", push_value);
+        do{
+            scanf("%s %lf", &command, &push_value);
 
-//        StackLogic(&a, command, push_value);
 
-        scanf("%lf", &push_value);
-        StackPush(&a, push_value);
-        StackPrint(&a);
+            printf("Command: %s\n", command);
+            printf("Value = %.3lf\n", push_value);
 
-        scanf("%lf", &push_value);
-        StackPush(&a, push_value);
-        StackPrint(&a);
+            StackLogic(&a, command, push_value);
+            StackPrint(&a);
+          }
+        while(strcmp(command, "HLT") != 0);
 
-        StackAdd(&a);
-        StackPrint(&a);
+//        scanf("%lf", &push_value);
+//        StackPush(&a, push_value);
+//        StackPrint(&a);
+//
+//        scanf("%lf", &push_value);
+//        StackPush(&a, push_value);
+//        StackPrint(&a);
+//
+//        StackAdd(&a);
+
 
 //
 //        scanf("%lf", &push_value);
@@ -90,9 +103,6 @@ int main()
 //        StackDiv(&a);
 //        StackPrint(&a);
 //        StackDamp(&a);
-
-
-
         free(a.data);
         return 0;
     }
@@ -217,13 +227,29 @@ void StackAdd(Stack * st)
 
 void StackLogic(Stack * st, char command[], stack_type push_value)
     {
-        if(strcmp(command, "PUSH") == 1)
+        if(strcmp(command, "PUSH") == 0)
             {
                 StackPush(st, push_value);
             }
-        else if(strcmp(command, "POP") == 1)
+        else if(strcmp(command, "POP") == 0)
             {
                 StackPop(st);
+            }
+        else if(strcmp(command, "ADD") == 0)
+            {
+                StackAdd(st);
+            }
+        else if(strcmp(command, "SUB") == 0)
+            {
+                StackSub(st);
+            }
+        else if(strcmp(command, "MUL") == 0)
+            {
+                StackMul(st);
+            }
+        else if(strcmp(command, "DIV") == 0)
+            {
+                StackDiv(st);
             }
     }
 
