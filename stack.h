@@ -44,7 +44,7 @@ void StackDiv(Stack * st);
 
 void StackPrint(Stack * st);
 
-void StackLogic(Stack * st, char command[], stack_type push_value); // исправить   массив динамически
+void StackLogic(Stack * st, char * command, stack_type push_value);
 
 void StackAdd(Stack * st);
 

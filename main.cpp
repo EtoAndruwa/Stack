@@ -17,28 +17,6 @@ int main()
 
 
 
-//int StackCheck(Stack * st)
-//    {
-//        if(st->data == NULL)
-//            {
-//                return ERR_NULL_DATA;
-//            }
-//        else if(st->size >= 5)
-//            {
-//                return ERR_OUT_OF_STACK;
-//            }
-//    }
-//
-//void StackDetor(Stack * st)
-//    {
-//        free(st->data);
-//    }
-
-//void StackRealoc(Stack * a)
-//    {
-//        free(a->data);
-//
-//    }
 
 
 
