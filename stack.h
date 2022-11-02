@@ -9,28 +9,36 @@
 typedef double stack_type;
 typedef struct
 {
-    stack_type * data;
-    size_t capacity;
-    size_t size;
-    size_t error_code;
-
+    stack_type * data = nullptr;
+    size_t capacity = 0;
+    size_t size = 0;
+    size_t error_code = 0; 
 }Stack;
 
 const double POISON_VALUE = NAN;
 
 const size_t MAX_LINE_COMMAND = 5;
+const size_t MAX_CAPACITY = 0;
+const size_t CANARY = 0xDEAD;
 
 enum error_list
 {
     ERR_NULL_DATA = 1,
-    ERR_OUT_OF_STACK = 2
+    ERR_OUT_OF_STACK_RIGHT = 2,
+    ERR_OUT_OF_STACK_LEFT = 3,
+    ERR_LEFT_CANARY_DEAD = 4,
+    ERR_RIGHT_CANARY_DEAD = 5,
+    ERR_RIGHT_BUFFER_CANARY_DEAD = 6,
+    ERR_LEFT_BUFFER_CANARY_DEAD = 7
 };
 
-void StackInit(Stack * st, size_t capacity);
+void StackCtor(Stack * st);
 
 void StackPush(Stack * st, stack_type push_value);
 
-//int StackCheck(Stack * st);
+void StackCheck(Stack * st);
+
+void StackDtor(Stack * st);
 
 void StackDump(Stack * st);
 

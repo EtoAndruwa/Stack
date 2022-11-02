@@ -1,17 +1,14 @@
 #include  "stack.h"
 
 int main()
-{
-    Stack stack = {.capacity = 0, .size = 0, .error_code = 0};
+{   
+    Stack stack = {};
 
-    StackInit(&stack, 5);
-
+    StackCtor(&stack);
     StackPrint(&stack);
-
     StackConsoleWork(&stack);
-    StackDump(&stack);
+    StackDtor(&stack);
 
-    free(stack.data);
     return 0;
 }
 
