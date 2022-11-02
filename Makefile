@@ -3,17 +3,17 @@ CFLAGS=-c -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-eq
 
 all: main prog_ex
 
-main: main.o stack.o 
-	gcc main.o stack.o -o stack.exe
+main: main.o Stack.o 
+	gcc main.o Stack.o -o Stack.exe
 
 main.o: main.cpp
 	gcc $(CFLAGS) main.cpp
 
 stack.o: stack.cpp
-	gcc $(CFLAGS) stack.cpp
+	gcc $(CFLAGS) Stack.cpp
 
 prog_ex: 
-	./stack.exe
+	./Stack.exe
 
 clean: 
 	rm -rf *.o main

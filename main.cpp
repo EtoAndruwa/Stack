@@ -8,7 +8,9 @@ int main()
     StackPrint(&stack);
     StackConsoleWork(&stack);
     StackDtor(&stack);
+    StackPrint(&stack);
 
+    free(stack.data);
     return 0;
 }
 

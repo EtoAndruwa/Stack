@@ -55,7 +55,7 @@ void StackDump(Stack * st)
         fprintf(file, "Stack * data = %p\n", st->data);
         fprintf(file, "Stack capacity = %ld\n", st->capacity);
         fprintf(file, "Stack size = %ld\n", st->size);
-        fprintf(file, "Stack error_code = %ld\n\n", st->error_code);
+        fprintf(file, "Stack error_code = %ld\n", st->error_code);
 
         fprintf(file, "data[-1] = %.3lf", *((st->data) - 1 * sizeof(stack_type)));
         fprintf(file, "\t address %p\n", ((st->data) - 1));
@@ -184,7 +184,7 @@ void StackConsoleWork(Stack * st)
 }
 
 void StackCheck(Stack * st)
-{
+{   
     if(st->data == nullptr)
     {
         st->error_code = ERR_NULL_DATA;
@@ -192,7 +192,7 @@ void StackCheck(Stack * st)
         StackDtor(st);
         abort();
     }
-    else if(st->size >= st->capacity)
+    else if(st->size > st->capacity)
     {
         st->error_code = ERR_OUT_OF_STACK_RIGHT;
         StackDump(st);
@@ -203,7 +203,7 @@ void StackCheck(Stack * st)
     {   
         st->error_code = ERR_OUT_OF_STACK_LEFT;
         StackDump(st);
-        StackDtor(st);
+        StackDtor(st);;
         abort();
     }
     else if(*((st->data) - 1 * sizeof(stack_type)) != CANARY)
@@ -225,6 +225,7 @@ void StackCheck(Stack * st)
         st->error_code = ERR_LEFT_CANARY_DEAD;
         StackDump(st);
         StackDtor(st);
+        StackPrint(st);
         abort();
     }
     else if(st->data[st->capacity-1] != CANARY)
@@ -242,6 +243,7 @@ void StackDtor(Stack * st)
     {
         st->data[i] = POISON_VALUE;
     }
+    StackPrint(st);
     st->capacity = POISON_VALUE;
     st->size = POISON_VALUE;
     st->data = nullptr;
