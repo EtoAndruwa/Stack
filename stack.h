@@ -12,14 +12,16 @@ typedef struct
     stack_type * data = nullptr;
     size_t capacity = 0;
     size_t size = 0;
-    size_t error_code = 0; 
+    size_t error_code = 0;
+    size_t left_canary_position = 0;
+    size_t right_canary_position = 0; 
 }Stack;
 
 const double POISON_VALUE = NAN;
 
 const size_t MAX_LINE_COMMAND = 5;
 const size_t MAX_CAPACITY = 0;
-const size_t CANARY = 0xDEAD;
+const stack_type CANARY = 0xDEAD;
 
 enum error_list
 {
@@ -57,6 +59,10 @@ void StackLogic(Stack * st, char * command, stack_type push_value);
 void StackAdd(Stack * st);
 
 void StackConsoleWork(Stack * st);
+
+void StackRealocUp(Stack * st, char * command);
+
+void StackRealocDown(Stack * st, char * command);
 
 
 #endif // STACK_H

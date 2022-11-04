@@ -10,8 +10,12 @@ void StackCtor(Stack * st)
     st->capacity = st->capacity + 2; 
     st->size = 1;
     st->data = (stack_type *)calloc(st->capacity, sizeof(stack_type));
+
+    st->left_canary_position = 0;
+    st->right_canary_position = st->capacity - 1;
     st->data[0] = CANARY;
     st->data[st->capacity-1] = CANARY;
+    
     StackCheck(st, FUNC_NAME, FUNC_LINE);
     for(int  i = 1; i < st->capacity-1; i++)
     {   
@@ -53,11 +57,13 @@ void StackDump(Stack * st, const char * FUNCT_NAME, int FUNCT_LINE)
         fprintf(file, "Stack * data = %p\n", st->data);
         fprintf(file, "Stack capacity = %ld\n", st->capacity);
         fprintf(file, "Stack size = %ld\n\n", st->size);
+        fprintf(file, "Left canary position = %ld\n", st->left_canary_position);
+        fprintf(file, "Right canary position = %ld\n\n", st->right_canary_position);
 
         fprintf(file, "Stack error code = %ld\n", st->error_code);
         fprintf(file, "Called from file: %s\n", __FILE__);
         fprintf(file, "Called error function name: %s\n", FUNCT_NAME);
-        fprintf(file, "Called from line: %d\n", FUNCT_LINE);
+        fprintf(file, "Called from line: %d\n", FUNCT_LINE);    
         fprintf(file, "Date when was called: %s\n", __DATE__);
         fprintf(file, "Time when was called: %s\n\n", __TIME__);
 
@@ -69,7 +75,7 @@ void StackDump(Stack * st, const char * FUNCT_NAME, int FUNCT_LINE)
             if(i == st->capacity - 1)
             {
                 fprintf(file, "data[%d] = %.3lf", i, st->data[i]);
-                fprintf(file, "\t address %p\n", st->data + i);
+                fprintf(file, "\t address %p\n\n", st->data + i);
             }   
             else
             {
@@ -145,27 +151,33 @@ void StackAdd(Stack * st)
 void StackLogic(Stack * st, char * command, stack_type push_value)
 {
     if(strcmp(command, "PUSH") == 0)
-    {
+    {   
+        StackRealocUp(st, command);
         StackPush(st, push_value);
     }
     else if(strcmp(command, "POP") == 0)
-    {
+    {   
+        StackRealocDown(st, command);
         StackPop(st);
     }
     else if(strcmp(command, "ADD") == 0)
-    {
+    {   
+        StackRealocDown(st, command);
         StackAdd(st);
     }
     else if(strcmp(command, "SUB") == 0)
-    {
+    {   
+        StackRealocDown(st, command);
         StackSub(st);
     }
     else if(strcmp(command, "MUL") == 0)
-    {
+    {   
+        StackRealocDown(st, command);
         StackMul(st);
     }
     else if(strcmp(command, "DIV") == 0)
-    {
+    {   
+        StackRealocDown(st, command);
         StackDiv(st);
     }
 }
@@ -174,7 +186,8 @@ void StackConsoleWork(Stack * st)
 {
     char * command = (char *)calloc(MAX_LINE_COMMAND, sizeof(size_t));
     stack_type push_value = 0;
-    do{
+    do
+    {
         scanf("%s", command);
         if(strcmp(command, "PUSH") == 0)
         {
@@ -184,7 +197,7 @@ void StackConsoleWork(Stack * st)
         StackLogic(st, command, push_value);
         StackPrint(st);
 
-        }
+    }
     while(strcmp(command, "HLT") != 0)    ;
     free(command);
 }
@@ -243,23 +256,60 @@ void StackCheck(Stack * st, const char * FUNCT_NAME, int FUNCT_LINE)
 }
 
 void StackDtor(Stack * st)
-   {
-    for(int  i = 1; i < st->capacity-1; i++)
+{
+    for(int  i = 1; i < st->capacity - 1; i++)
     {
         st->data[i] = POISON_VALUE;
     }
     //StackPrint(st);
     st->capacity = POISON_VALUE;
     st->size = POISON_VALUE;
+    st->right_canary_position = POISON_VALUE;
+    st->left_canary_position = POISON_VALUE;
     free(st->data);
     st->data = nullptr;
-   }
+}
 
-// void StackRealoc(Stack * st)
-//    {
-//        stack_type * st_new  = (stack_type *)realloc();
+void StackRealocUp(Stack * st, char * command)
+{
+    if(st->size == (st->capacity -1))
+    {   
+        // printf("Old capacity PUSH: %ld\n", st->capacity);
+        st->data[st->capacity - 1] = POISON_VALUE;
+        size_t old_right_canary_post = st->right_canary_position;
+        st->capacity *= 2;
+        // printf("New capacity PUSH: %ld\n", st->capacity);
 
-//    }
+        st->data = (stack_type *)realloc(st->data, st->capacity * sizeof(stack_type));
+
+        st->data[st->capacity - 1] = CANARY;
+        st->right_canary_position = st->capacity - 1;
+
+        for(size_t  i = old_right_canary_post; i < st->right_canary_position; i++)
+        {   
+        st->data[i] = POISON_VALUE;
+        }
+
+        StackCheck(st, FUNC_NAME, FUNC_LINE);
+    }
+}
+
+void StackRealocDown(Stack * st, char * command)
+{
+    if((st->size <= (st->capacity - 2) / 2) && (st->capacity > 3))
+        {   
+            st->data[st->capacity - 1] = POISON_VALUE;
+            // printf("Old capacity POP: %ld\n", st->capacity);    
+            st->capacity = st->capacity - ((st->capacity -1 )/2);
+            // printf("New capacity POP: %ld\n", st->capacity);
+
+            st->data = (stack_type *)realloc(st->data, st->capacity * sizeof(stack_type));
+
+            st->data[st->capacity - 1] = CANARY;
+            st->right_canary_position = st->capacity - 1;
+            StackCheck(st, FUNC_NAME, FUNC_LINE);
+        }
+}
 
 
 
