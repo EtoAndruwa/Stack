@@ -1,5 +1,8 @@
 #include  "stack.h"
 
+#define FUNC_NAME __func__
+#define FUNC_LINE __LINE__  
+
 void StackCtor(Stack * st)
 {   
     printf("Enter stack capacity: ");
@@ -7,42 +10,37 @@ void StackCtor(Stack * st)
     st->capacity = st->capacity + 2; 
     st->size = 1;
     st->data = (stack_type *)calloc(st->capacity, sizeof(stack_type));
-    // StackCheck(st);
-    for(int  i = 0; i < st->capacity; i++)
+    st->data[0] = CANARY;
+    st->data[st->capacity-1] = CANARY;
+    StackCheck(st, FUNC_NAME, FUNC_LINE);
+    for(int  i = 1; i < st->capacity-1; i++)
     {   
-        if((i == 0) || (i == (st->capacity - 1)))
-        {
-            st->data[i] = CANARY;
-        }
-        else
-        {
-            st->data[i] = POISON_VALUE;
-        }
+       st->data[i] = POISON_VALUE;
     }
 
-    *(st->data + st->capacity) = CANARY;
-    *((st->data) - 1 * sizeof(stack_type)) = CANARY;
-    StackCheck(st);
+    // *(st->data + st->capacity) = CANARY;
+    // *((st->data) - 1 * sizeof(stack_type)) = CANARY;
+    StackCheck(st, FUNC_NAME, FUNC_LINE);
 }
 
 void StackPush(Stack * st, stack_type push_value)
-{
-    StackCheck(st);
+{   
+    StackCheck(st, FUNC_NAME, FUNC_LINE);
     st->data[st->size++] = push_value; 
-    StackCheck(st);
+    StackCheck(st, FUNC_NAME, FUNC_LINE);
 }
 
 stack_type StackPop(Stack * st)
 {   
-    StackCheck(st);
+    StackCheck(st, FUNC_NAME, FUNC_LINE);
     stack_type temp = st->data[st->size - 1];
     st->data[st->size - 1] = POISON_VALUE;
     st->size--;
-    StackCheck(st);
+    StackCheck(st, FUNC_NAME, FUNC_LINE);
     return temp;
 }
 
-void StackDump(Stack * st)
+void StackDump(Stack * st, const char * FUNCT_NAME, int FUNCT_LINE)
 {
     FILE *file = fopen("log.txt", "a+");
     if (file == NULL)
@@ -54,11 +52,18 @@ void StackDump(Stack * st)
         fprintf(file, "-------------------START OF STACK DUMP------------------------\n\n");
         fprintf(file, "Stack * data = %p\n", st->data);
         fprintf(file, "Stack capacity = %ld\n", st->capacity);
-        fprintf(file, "Stack size = %ld\n", st->size);
-        fprintf(file, "Stack error_code = %ld\n", st->error_code);
+        fprintf(file, "Stack size = %ld\n\n", st->size);
 
-        fprintf(file, "data[-1] = %.3lf", *((st->data) - 1 * sizeof(stack_type)));
-        fprintf(file, "\t address %p\n", ((st->data) - 1));
+        fprintf(file, "Stack error code = %ld\n", st->error_code);
+        fprintf(file, "Called from file: %s\n", __FILE__);
+        fprintf(file, "Called error function name: %s\n", FUNCT_NAME);
+        fprintf(file, "Called from line: %d\n", FUNCT_LINE);
+        fprintf(file, "Date when was called: %s\n", __DATE__);
+        fprintf(file, "Time when was called: %s\n\n", __TIME__);
+
+
+        // fprintf(file, "data[-1] = %.3lf", *((st->data) - 1 * sizeof(stack_type)));
+        // fprintf(file, "\t address %p\n", ((st->data) - 1));
         for(int i = 0; i < st->capacity; i++)
         {
             if(i == st->capacity - 1)
@@ -72,8 +77,8 @@ void StackDump(Stack * st)
                 fprintf(file, "\t address %p\n", st->data + i);
             }
         }
-        fprintf(file, "data[+1] = %.3lf", *(st->data + st->capacity));
-        fprintf(file, "\t address %p\n\n", st->data + st->capacity);
+        // fprintf(file, "data[+1] = %.3lf", *(st->data + st->capacity));
+        // fprintf(file, "\t address %p\n\n", st->data + st->capacity);
         fprintf(file, "--------------------END OF STACK DUMP--------------------------\n\n");
     }
     fclose(file);
@@ -81,41 +86,42 @@ void StackDump(Stack * st)
 
 void StackMul(Stack * st)
 {   
-    StackCheck(st);
+    StackCheck(st, FUNC_NAME, FUNC_LINE);
     st->data[st->size - 2] = st->data[st->size - 1] * st->data[st->size - 2];
     st->data[st->size - 1] = POISON_VALUE;
     st->size--;
-    StackCheck(st);
+    StackCheck(st, FUNC_NAME, FUNC_LINE);
 }
 
 void StackSub(Stack * st)
 {   
-    StackCheck(st);
+    StackCheck(st, FUNC_NAME, FUNC_LINE);
     st->data[st->size - 2] = st->data[st->size - 2] - st->data[st->size - 1];
     st->data[st->size - 1] = POISON_VALUE;
     st->size--;
-    StackCheck(st);
+    StackCheck(st, FUNC_NAME, FUNC_LINE);
 }
 
 void StackDiv(Stack * st)
 {   
-    StackCheck(st);
+    StackCheck(st, FUNC_NAME, FUNC_LINE);
     st->data[st->size - 2] = (st->data[st->size - 2]) / (st->data[st->size - 1]);
     st->data[st->size - 1] = POISON_VALUE;
     st->size--;
-    StackCheck(st);
+    StackCheck(st, FUNC_NAME, FUNC_LINE);
 }
 
 void StackPrint(Stack * st)
 {   
-    printf("data[-1] = %.3lf", *((st->data) - 1 * sizeof(stack_type)));
-    printf("\t address %p\n", ((st->data) - 1));
+    // printf("data[-1] = %.3lf", *((st->data) - 1 * sizeof(stack_type)));
+    // printf("\t address %p\n", ((st->data) - 1));
+    printf("\n");
     for(int i = 0; i < st->capacity; i++)
     {
         if(i == st->capacity - 1)
         {
             printf("data[%d] = %.3lf", i, st->data[i]);
-            printf("\t address %p\n", st->data + i);
+            printf("\t address %p\n\n", st->data + i);
         }
         else
         {
@@ -123,20 +129,20 @@ void StackPrint(Stack * st)
             printf("\t address %p\n", st->data + i);
         }
     }
-    printf("data[+1] = %.3lf", *(st->data + st->capacity));
-    printf("\t address %p\n\n", st->data + st->capacity);
+    // printf("data[+1] = %.3lf", *(st->data + st->capacity));
+    // printf("\t address %p\n\n", st->data + st->capacity);
 }
 
-void StackAdd(Stack * st)//OK
+void StackAdd(Stack * st)
 {   
-    StackCheck(st);
+    StackCheck(st, FUNC_NAME, FUNC_LINE);
     st->data[st->size - 2] = (st->data[st->size - 2]) + (st->data[st->size - 1]);
     st->data[st->size - 1] = POISON_VALUE;
     st->size--;
-    StackCheck(st);
+    StackCheck(st, FUNC_NAME, FUNC_LINE);
 }
 
-void StackLogic(Stack * st, char * command, stack_type push_value)//OK
+void StackLogic(Stack * st, char * command, stack_type push_value)
 {
     if(strcmp(command, "PUSH") == 0)
     {
@@ -183,55 +189,54 @@ void StackConsoleWork(Stack * st)
     free(command);
 }
 
-void StackCheck(Stack * st)
+void StackCheck(Stack * st, const char * FUNCT_NAME, int FUNCT_LINE)
 {   
     if(st->data == nullptr)
     {
         st->error_code = ERR_NULL_DATA;
-        StackDump(st);
+        StackDump(st, FUNCT_NAME, FUNCT_LINE);
         StackDtor(st);
         abort();
     }
     else if(st->size > st->capacity)
     {
         st->error_code = ERR_OUT_OF_STACK_RIGHT;
-        StackDump(st);
+        StackDump(st, FUNCT_NAME, FUNCT_LINE);
         StackDtor(st);
         abort();
     }
     else if(st->size < 0)
     {   
         st->error_code = ERR_OUT_OF_STACK_LEFT;
-        StackDump(st);
+        StackDump(st, FUNCT_NAME, FUNCT_LINE);
         StackDtor(st);;
         abort();
     }
-    else if(*((st->data) - 1 * sizeof(stack_type)) != CANARY)
-    {   
-        st->error_code = ERR_LEFT_BUFFER_CANARY_DEAD;
-        StackDump(st);
-        StackDtor(st);
-        abort();
-    }
-    else if(*(st->data + st->capacity) != CANARY)
-    {   
-        st->error_code = ERR_RIGHT_BUFFER_CANARY_DEAD;
-        StackDump(st);
-        StackDtor(st);
-        abort();
-    }
+    // else if(*((st->data) - 1 * sizeof(stack_type)) != CANARY)
+    // {   
+    //     st->error_code = ERR_LEFT_BUFFER_CANARY_DEAD;
+    //     StackDump(st, FUNCT_NAME, FUNCT_LINE);
+    //     StackDtor(st);
+    //     abort();
+    // }
+    // else if(*(st->data + st->capacity) != CANARY)
+    // {   
+    //     st->error_code = ERR_RIGHT_BUFFER_CANARY_DEAD;
+    //     StackDump(st, FUNCT_NAME, FUNCT_LINE);
+    //     StackDtor(st);
+    //     abort();
+    // }
     else if(st->data[0] != CANARY)
     {   
         st->error_code = ERR_LEFT_CANARY_DEAD;
-        StackDump(st);
+        StackDump(st, FUNCT_NAME, FUNCT_LINE);
         StackDtor(st);
-        StackPrint(st);
         abort();
     }
     else if(st->data[st->capacity-1] != CANARY)
     {   
         st->error_code = ERR_RIGHT_CANARY_DEAD;
-        StackDump(st);
+        StackDump(st, FUNCT_NAME, FUNCT_LINE);
         StackDtor(st);
         abort();
     }       
@@ -239,21 +244,21 @@ void StackCheck(Stack * st)
 
 void StackDtor(Stack * st)
    {
-    for(int  i = 0; i < st->capacity; i++)
+    for(int  i = 1; i < st->capacity-1; i++)
     {
         st->data[i] = POISON_VALUE;
     }
-    StackPrint(st);
+    //StackPrint(st);
     st->capacity = POISON_VALUE;
     st->size = POISON_VALUE;
-    st->data = nullptr;
     free(st->data);
+    st->data = nullptr;
    }
 
-//void StackRealoc(Stack * a)
+// void StackRealoc(Stack * st)
 //    {
-//        free(a->data);
-//
+//        stack_type * st_new  = (stack_type *)realloc();
+
 //    }
 
 

@@ -27,20 +27,20 @@ enum error_list
     ERR_OUT_OF_STACK_RIGHT = 2,
     ERR_OUT_OF_STACK_LEFT = 3,
     ERR_LEFT_CANARY_DEAD = 4,
-    ERR_RIGHT_CANARY_DEAD = 5,
-    ERR_RIGHT_BUFFER_CANARY_DEAD = 6,
-    ERR_LEFT_BUFFER_CANARY_DEAD = 7
+    ERR_RIGHT_CANARY_DEAD = 5
+    // ERR_RIGHT_BUFFER_CANARY_DEAD = 6,
+    // ERR_LEFT_BUFFER_CANARY_DEAD = 7
 };
 
 void StackCtor(Stack * st);
 
 void StackPush(Stack * st, stack_type push_value);
 
-void StackCheck(Stack * st);
+void StackCheck(Stack * st,  const char * FUNCT_NAME, int FUNCT_LINE);
 
 void StackDtor(Stack * st);
 
-void StackDump(Stack * st);
+void StackDump(Stack * st,  const char * FUNCT_NAME, int FUNCT_LINE);
 
 stack_type StackPop(Stack * st);
 
