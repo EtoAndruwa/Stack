@@ -8,13 +8,14 @@
 
 typedef double stack_type;
 typedef struct
-{
+{   
     stack_type * data = nullptr;
     size_t capacity = 0;
     size_t size = 0;
     size_t error_code = 0;
     size_t left_canary_position = 0;
     size_t right_canary_position = 0; 
+    size_t hash = 0;
 }Stack;
 
 const double POISON_VALUE = NAN;
@@ -23,16 +24,19 @@ const size_t MAX_LINE_COMMAND = 5;
 const size_t MAX_CAPACITY = 0;
 const stack_type CANARY = 0xDEAD;
 
-enum error_list
+enum error_list_codes
 {
     ERR_NULL_DATA = 1,
     ERR_OUT_OF_STACK_RIGHT = 2,
     ERR_OUT_OF_STACK_LEFT = 3,
     ERR_LEFT_CANARY_DEAD = 4,
-    ERR_RIGHT_CANARY_DEAD = 5
+    ERR_RIGHT_CANARY_DEAD = 5,
+    ERR_HASH_CHANGED = 6
     // ERR_RIGHT_BUFFER_CANARY_DEAD = 6,
     // ERR_LEFT_BUFFER_CANARY_DEAD = 7
 };
+
+char* enum_to_string(size_t code);
 
 void StackCtor(Stack * st);
 
@@ -63,6 +67,10 @@ void StackConsoleWork(Stack * st);
 void StackRealocUp(Stack * st, char * command);
 
 void StackRealocDown(Stack * st, char * command);
+
+void Calculate_hash(Stack * st);
+
+size_t Get_cur_value_of_hash(Stack * st);
 
 
 #endif // STACK_H

@@ -15,6 +15,7 @@ void StackCtor(Stack * st)
     st->right_canary_position = st->capacity - 1;
     st->data[0] = CANARY;
     st->data[st->capacity-1] = CANARY;
+    st->hash = 0;
     
     StackCheck(st, FUNC_NAME, FUNC_LINE);
     for(int  i = 1; i < st->capacity-1; i++)
@@ -26,11 +27,15 @@ void StackCtor(Stack * st)
     // *((st->data) - 1 * sizeof(stack_type)) = CANARY;
     StackCheck(st, FUNC_NAME, FUNC_LINE);
 }
-
+    
 void StackPush(Stack * st, stack_type push_value)
 {   
     StackCheck(st, FUNC_NAME, FUNC_LINE);
     st->data[st->size++] = push_value; 
+
+    st->hash = st->hash + push_value; // calculating new hash value
+    printf("Hash value: %ld", st->hash);
+
     StackCheck(st, FUNC_NAME, FUNC_LINE);
 }
 
@@ -40,6 +45,10 @@ stack_type StackPop(Stack * st)
     stack_type temp = st->data[st->size - 1];
     st->data[st->size - 1] = POISON_VALUE;
     st->size--;
+
+    st->hash = st->hash - temp; // calculating new hash value
+    printf("Hash value: %ld", st->hash);
+
     StackCheck(st, FUNC_NAME, FUNC_LINE);
     return temp;
 }
@@ -52,15 +61,17 @@ void StackDump(Stack * st, const char * FUNCT_NAME, int FUNCT_LINE)
         printf("ERROR: log file cannot be open");
     }
     else
-    {
+    {   
+
         fprintf(file, "-------------------START OF STACK DUMP------------------------\n\n");
         fprintf(file, "Stack * data = %p\n", st->data);
         fprintf(file, "Stack capacity = %ld\n", st->capacity);
         fprintf(file, "Stack size = %ld\n\n", st->size);
         fprintf(file, "Left canary position = %ld\n", st->left_canary_position);
         fprintf(file, "Right canary position = %ld\n\n", st->right_canary_position);
+        fprintf(file, "Stack hash = %ld\n\n", st->hash);
 
-        fprintf(file, "Stack error code = %ld\n", st->error_code);
+        fprintf(file, "Stack error code = %ld (%s)\n", st->error_code, enum_to_string(st->error_code));
         fprintf(file, "Called from file: %s\n", __FILE__);
         fprintf(file, "Called error function name: %s\n", FUNCT_NAME);
         fprintf(file, "Called from line: %d\n", FUNCT_LINE);    
@@ -96,6 +107,9 @@ void StackMul(Stack * st)
     st->data[st->size - 2] = st->data[st->size - 1] * st->data[st->size - 2];
     st->data[st->size - 1] = POISON_VALUE;
     st->size--;
+
+    Calculate_hash(st);
+
     StackCheck(st, FUNC_NAME, FUNC_LINE);
 }
 
@@ -105,6 +119,9 @@ void StackSub(Stack * st)
     st->data[st->size - 2] = st->data[st->size - 2] - st->data[st->size - 1];
     st->data[st->size - 1] = POISON_VALUE;
     st->size--;
+
+    Calculate_hash(st);
+
     StackCheck(st, FUNC_NAME, FUNC_LINE);
 }
 
@@ -114,6 +131,9 @@ void StackDiv(Stack * st)
     st->data[st->size - 2] = (st->data[st->size - 2]) / (st->data[st->size - 1]);
     st->data[st->size - 1] = POISON_VALUE;
     st->size--;
+
+    Calculate_hash(st);
+
     StackCheck(st, FUNC_NAME, FUNC_LINE);
 }
 
@@ -126,13 +146,13 @@ void StackPrint(Stack * st)
     {
         if(i == st->capacity - 1)
         {
-            printf("data[%d] = %.3lf", i, st->data[i]);
-            printf("\t address %p\n\n", st->data + i);
+            printf("data[%d] = %.3lf\n\n", i, st->data[i]);
+            //printf("\t address %p\n\n", st->data + i);
         }
         else
         {
-            printf("data[%d] = %.3lf", i, st->data[i]);
-            printf("\t address %p\n", st->data + i);
+            printf("data[%d] = %.3lf\n", i, st->data[i]);
+            //printf("\t address %p\n", st->data + i);
         }
     }
     // printf("data[+1] = %.3lf", *(st->data + st->capacity));
@@ -145,6 +165,9 @@ void StackAdd(Stack * st)
     st->data[st->size - 2] = (st->data[st->size - 2]) + (st->data[st->size - 1]);
     st->data[st->size - 1] = POISON_VALUE;
     st->size--;
+
+    Calculate_hash(st);
+
     StackCheck(st, FUNC_NAME, FUNC_LINE);
 }
 
@@ -252,7 +275,14 @@ void StackCheck(Stack * st, const char * FUNCT_NAME, int FUNCT_LINE)
         StackDump(st, FUNCT_NAME, FUNCT_LINE);
         StackDtor(st);
         abort();
-    }       
+    }
+    else if(st->hash != Get_cur_value_of_hash(st))   
+    {
+        st->error_code = ERR_HASH_CHANGED;
+        StackDump(st, FUNCT_NAME, FUNCT_LINE);
+        StackDtor(st);
+        abort();
+    }    
 }
 
 void StackDtor(Stack * st)
@@ -266,6 +296,7 @@ void StackDtor(Stack * st)
     st->size = POISON_VALUE;
     st->right_canary_position = POISON_VALUE;
     st->left_canary_position = POISON_VALUE;
+    st->hash = POISON_VALUE;
     free(st->data);
     st->data = nullptr;
 }
@@ -289,7 +320,7 @@ void StackRealocUp(Stack * st, char * command)
         {   
         st->data[i] = POISON_VALUE;
         }
-
+        st->data[2] = 6;
         StackCheck(st, FUNC_NAME, FUNC_LINE);
     }
 }
@@ -297,19 +328,66 @@ void StackRealocUp(Stack * st, char * command)
 void StackRealocDown(Stack * st, char * command)
 {
     if((st->size <= (st->capacity - 2) / 2) && (st->capacity > 3))
-        {   
-            st->data[st->capacity - 1] = POISON_VALUE;
-            // printf("Old capacity POP: %ld\n", st->capacity);    
-            st->capacity = st->capacity - ((st->capacity -1 )/2);
-            // printf("New capacity POP: %ld\n", st->capacity);
+    {   
+        st->data[st->capacity - 1] = POISON_VALUE;
+        // printf("Old capacity POP: %ld\n", st->capacity);    
+        st->capacity = st->capacity - ((st->capacity -1 )/2);
+        // printf("New capacity POP: %ld\n", st->capacity);
 
-            st->data = (stack_type *)realloc(st->data, st->capacity * sizeof(stack_type));
+        st->data = (stack_type *)realloc(st->data, st->capacity * sizeof(stack_type));
 
-            st->data[st->capacity - 1] = CANARY;
-            st->right_canary_position = st->capacity - 1;
-            StackCheck(st, FUNC_NAME, FUNC_LINE);
-        }
+        st->data[st->capacity - 1] = CANARY;
+        st->right_canary_position = st->capacity - 1;
+        StackCheck(st, FUNC_NAME, FUNC_LINE);
+    }
 }
+
+void Calculate_hash(Stack * st)
+{
+    st->hash = 0; // calculating new hash
+    for(size_t i = 1; i < st->size; i++)
+    {
+        st->hash = st->hash + st->data[i]; 
+    }
+    printf("Hash value: %ld", st->hash);
+}
+
+size_t Get_cur_value_of_hash(Stack * st)
+{   
+    size_t cur_value_of_hash = 0;
+    for(size_t i = 1; i < st->size; i++)
+    {
+        cur_value_of_hash = cur_value_of_hash + st->data[i]; 
+    }    
+
+    return cur_value_of_hash;
+}
+
+char* enum_to_string(size_t code)
+{
+    switch(code)
+    {
+        case 1:
+            return "ERR_NULL_DATA";
+            break;
+        case 2:
+            return "ERR_OUT_OF_STACK_RIGHT";
+            break;
+        case 3:
+            return "ERR_OUT_OF_STACK_LEFT";
+            break;
+        case 4:
+            return "ERR_LEFT_CANARY_DEAD";
+            break;
+        case 5:
+            return "ERR_RIGHT_CANARY_DEAD";
+            break;
+        case 6:
+            return "ERR_HASH_CHANGED";
+            break;
+    }
+}
+
 
 
 
