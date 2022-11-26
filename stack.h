@@ -31,22 +31,23 @@ enum error_list_codes
     ERR_OUT_OF_STACK_LEFT = 3,
     ERR_LEFT_CANARY_DEAD = 4,
     ERR_RIGHT_CANARY_DEAD = 5,
-    ERR_HASH_CHANGED = 6
+    ERR_HASH_CHANGED = 6,
+    STACK_IS_OK = 0
 };
 
 const char* Enum_to_string(size_t code); // converts an enum's int value to the enum's string value
 
 void StackCtor(Stack* st); // creates and initializes stack
 
-void StackPush(Stack* st, stack_type push_value); // gets value and pushes in to the stack
+void StackPush(Stack* st, stack_type push_value); // gets the value and pushes in to the stack
 
-void StackCheck(Stack* st,  const char * FUNCT_NAME, int FUNCT_LINE); //
+void StackCheck(Stack* st,  const char * FUNCT_NAME, int FUNCT_LINE); // checks the stack for the possible errors
 
-void StackDtor(Stack* st); // deletes the stack and spoils all stack's data with poison value
+void StackDtor(Stack* st); // deletes the stack and spoils all stack's data with the poison value
 
-void StackDump(Stack* st,  const char * FUNCT_NAME, int FUNCT_LINE); // 
+void StackDump(Stack* st,  const char * FUNCT_NAME, int FUNCT_LINE); // outputs the data to the LOG.txt about the stack
 
-void StackPop(Stack* st); // 
+void StackPop(Stack* st); // deletes the value from the stack
 
 void StackMul(Stack* st); // multiplies two values of the stack
 
@@ -56,15 +57,15 @@ void StackDiv(Stack* st); // divides the preceding element by the last element o
 
 void StackPrint(Stack* st); // prints the stack's current structure in the console
 
-void StackLogic(Stack* st, char* command, stack_type push_value); // 
+void StackLogic(Stack* st, char* command, stack_type push_value); // calls other functions depending on the entered command 
 
-void StackAdd(Stack* st); // adds the entered value to the stack
+void StackAdd(Stack* st); // adds the entered value to next empty memory cell of the stack
 
-void StackConsoleWork(Stack* st); // supports the work of program until 'HLT' was entered
+void StackConsoleWork(Stack* st); // supports the work of program until 'HLT' was entered in the console
 
-void StackRealocUp(Stack* st); // decreases the capacity of the stack
+void StackRealocUp(Stack* st); // increases the capacity of the stack, reallocs data
 
-void StackRealocDown(Stack* st); // increases the capacity of the stack
+void StackRealocDown(Stack* st); // decreases the capacity of the stack, reallocs data
 
 void Calculate_hash(Stack* st); // recalculates the value of hash everytime when called
 

@@ -3,7 +3,7 @@
 #define FUNC_NAME __func__ // used in order to get name of the function which called the error
 #define FUNC_LINE __LINE__ // used in order to get the line from which the error was called
 
-void StackCtor(Stack * st) // OK
+void StackCtor(Stack * st) // creates and initializes stack
 {   
     printf("Enter stack capacity: ");
     scanf("%ld", &st->capacity);
@@ -16,12 +16,7 @@ void StackCtor(Stack * st) // OK
 
     st->left_canary_position[0] = CANARY;
     st->right_canary_position[0] = CANARY;
-
     st->hash = 0;   
-
-    printf("LEFT CANARY ADDRESS: %p\n", st->left_canary_position);
-    printf("DATA ADDRESS: %p\n", st->data);
-    printf("RIGHT CANARY ADDRESS: %p\n", st->right_canary_position);
 
     StackCheck(st, FUNC_NAME, FUNC_LINE);
 
@@ -33,33 +28,34 @@ void StackCtor(Stack * st) // OK
     StackCheck(st, FUNC_NAME, FUNC_LINE);
 }
     
-void StackPush(Stack * st, stack_type push_value) // OK
+void StackPush(Stack * st, stack_type push_value) // gets the value and pushes in to the stack
 {   
     StackCheck(st, FUNC_NAME, FUNC_LINE);
-    st->data[st->next_empty_cell++] = push_value; 
 
+    st->data[st->next_empty_cell++] = push_value; 
     st->hash = st->hash + push_value; // calculating new hash value
     // printf("Hash value: %ld", st->hash);
 
     StackCheck(st, FUNC_NAME, FUNC_LINE);
 }
 
-void StackPop(Stack * st) // OK
+void StackPop(Stack * st) // deletes the value from the stack
 {   
     StackCheck(st, FUNC_NAME, FUNC_LINE);
+
     stack_type poped_value = st->data[st->next_empty_cell - 1];
     st->data[st->next_empty_cell - 1] = POISON_VALUE;
     st->next_empty_cell--;
-
     st->hash = st->hash - poped_value; // calculating new hash value
     // printf("Hash value: %ld", st->hash);
 
     StackCheck(st, FUNC_NAME, FUNC_LINE);
 }
 
-void StackDump(Stack * st, const char * FUNCT_NAME, int FUNCT_LINE)
+void StackDump(Stack * st, const char * FUNCT_NAME, int FUNCT_LINE) // outputs the data to the LOG.txt about the stack
 {
     FILE *file = fopen("LOG.txt", "a+");
+
     if (file == NULL)
     {
         printf("ERROR: LOG file cannot be open");
@@ -90,70 +86,70 @@ void StackDump(Stack * st, const char * FUNCT_NAME, int FUNCT_LINE)
         fprintf(file, "RIGHT CANARY = %ld\n", st->right_canary_position[0]);
         fprintf(file, "--------------------END OF STACK DUMP--------------------------\n\n");
     }
+
     fclose(file);
 }
 
-void StackMul(Stack * st) // OK
+void StackMul(Stack * st) // multiplies two values of the stack
 {   
     StackCheck(st, FUNC_NAME, FUNC_LINE);
+
     st->data[st->next_empty_cell - 2] = st->data[st->next_empty_cell - 1] * st->data[st->next_empty_cell - 2];
     st->data[st->next_empty_cell - 1] = POISON_VALUE;
     st->next_empty_cell--;
-
     Calculate_hash(st);
 
     StackCheck(st, FUNC_NAME, FUNC_LINE);
 }
 
-void StackSub(Stack * st) // OK
+void StackSub(Stack * st) // substracts one value of the stack from another one
 {   
     StackCheck(st, FUNC_NAME, FUNC_LINE);
+
     st->data[st->next_empty_cell - 2] = st->data[st->next_empty_cell - 2] - st->data[st->next_empty_cell - 1];
     st->data[st->next_empty_cell - 1] = POISON_VALUE;
     st->next_empty_cell--;
-
     Calculate_hash(st);
 
     StackCheck(st, FUNC_NAME, FUNC_LINE);
 }
 
-void StackDiv(Stack * st) // OK
+void StackDiv(Stack * st) // divides the preceding element by the last element of the stack
 {   
     StackCheck(st, FUNC_NAME, FUNC_LINE);
+
     st->data[st->next_empty_cell - 2] = (st->data[st->next_empty_cell - 2]) / (st->data[st->next_empty_cell - 1]);
     st->data[st->next_empty_cell - 1] = POISON_VALUE;
     st->next_empty_cell--;
-
     Calculate_hash(st);
 
     StackCheck(st, FUNC_NAME, FUNC_LINE);
 }
 
-void StackPrint(Stack * st) // OK
+void StackPrint(Stack * st) // prints the stack's current structure in the console
 {   
     printf("\n");
     printf("LEFT_CANARY: = %ld\n", *(st->left_canary_position));
-    for(size_t i = 0; i < st->capacity; i++) // check
+    for(size_t i = 0; i < st->capacity; i++) 
     {
         printf("data[%ld] = %.3lf\n", i, st->data[i]);
     }
     printf("RIGHT_CANARY: = %ld\n\n", *(st->right_canary_position));
 }
 
-void StackAdd(Stack * st) // OK
+void StackAdd(Stack * st) // adds the entered value to next empty memory cell of the stack
 {   
     StackCheck(st, FUNC_NAME, FUNC_LINE);
 
     st->data[st->next_empty_cell - 2] = (st->data[st->next_empty_cell - 2]) + (st->data[st->next_empty_cell - 1]);
     st->data[st->next_empty_cell - 1] = POISON_VALUE;
     st->next_empty_cell--;
-
     Calculate_hash(st);
 
     StackCheck(st, FUNC_NAME, FUNC_LINE);
 }
 
-void StackLogic(Stack * st, char * command, stack_type push_value) // OK
+void StackLogic(Stack * st, char * command, stack_type push_value) // calls other functions depending on the entered command 
 {
     if(strcmp(command, "PUSH") == 0)
     {   
@@ -187,11 +183,12 @@ void StackLogic(Stack * st, char * command, stack_type push_value) // OK
     }
 }
 
-void StackConsoleWork(Stack * st) // OK
+void StackConsoleWork(Stack * st) // supports the work of program until 'HLT' was entered in the console
 {
-    char * command = (char *)calloc(MAX_LINE_COMMAND, sizeof(size_t));
+    char * command = (char *)calloc(MAX_LINE_COMMAND, sizeof(char));
     stack_type push_value = 0;
-    do
+
+    while(strcmp(command, "HLT") != 0)
     {
         scanf("%s", command);
         if(strcmp(command, "PUSH") == 0)
@@ -201,13 +198,13 @@ void StackConsoleWork(Stack * st) // OK
 
         StackLogic(st, command, push_value);
         StackPrint(st);
-
     }
-    while(strcmp(command, "HLT") != 0)    ;
+
     free(command);
+    command = nullptr;
 }
 
-void StackCheck(Stack * st, const char * FUNCT_NAME, int FUNCT_LINE)
+void StackCheck(Stack * st, const char * FUNCT_NAME, int FUNCT_LINE) // checks the stack for the possible errors
 {   
     if(st->data == nullptr)
     {
@@ -250,10 +247,15 @@ void StackCheck(Stack * st, const char * FUNCT_NAME, int FUNCT_LINE)
         StackDump(st, FUNCT_NAME, FUNCT_LINE);
         StackDtor(st);
         abort();
-    }   
+    }
+    else
+    {   
+        st->error_code = STACK_IS_OK;
+        StackDump(st, FUNC_NAME, FUNC_LINE);
+    }
 }
 
-void StackDtor(Stack * st)
+void StackDtor(Stack * st) // deletes the stack and spoils all stack's data with the poison value
 {
     for(int  i = 0; i < st->capacity; i++)
     {
@@ -273,8 +275,10 @@ void StackDtor(Stack * st)
     st->stack_pointer = nullptr;
 }
 
-void StackRealocUp(Stack* st) // OK
-{
+void StackRealocUp(Stack* st) // increases the capacity of the stack, reallocs data
+{   
+    StackCheck(st, FUNC_NAME, FUNC_LINE);
+
     if(st->next_empty_cell == st->capacity)
     {   
         st->capacity *= 2;
@@ -293,13 +297,15 @@ void StackRealocUp(Stack* st) // OK
         st->left_canary_position[0] = CANARY;
         st->right_canary_position[0] = CANARY;
 
-        StackCheck(st, FUNC_NAME, FUNC_LINE);
     }
+
+    StackCheck(st, FUNC_NAME, FUNC_LINE);
 }
 
-void StackRealocDown(Stack* st) // OK
+void StackRealocDown(Stack* st) // decreases the capacity of the stack, reallocs data
 {   
     StackCheck(st, FUNC_NAME, FUNC_LINE);
+
     if((st->next_empty_cell <= (st->capacity - 2) / 2) && (st->capacity > 3))
     {   
         st->capacity = st->capacity - ((st->capacity -1 )/2);
@@ -318,25 +324,25 @@ void StackRealocDown(Stack* st) // OK
         st->left_canary_position[0] = CANARY;
         st->right_canary_position[0] = CANARY;
 
-        StackCheck(st, FUNC_NAME, FUNC_LINE);
     }
+
+    StackCheck(st, FUNC_NAME, FUNC_LINE);
 }
 
-void Calculate_hash(Stack * st) // OK
+void Calculate_hash(Stack * st) // recalculates the value of hash everytime when called
 {
     st->hash = 0; // calculating new hash
     for(size_t i = 0; i < st->next_empty_cell; i++)
     {
         st->hash = st->hash + st->data[i]; 
     }
-    printf("Hash value: %ld", st->hash);
+    printf("Hash value: %ld\n", st->hash);
 }
 
-size_t Get_cur_value_of_hash(Stack * st) // OK
+size_t Get_cur_value_of_hash(Stack * st) // calculates the current value of the hash
 {   
     size_t cur_value_of_hash = 0;
-
-    for(size_t i = 0; i < st->next_empty_cell; i++) // CHECK
+    for(size_t i = 0; i < st->next_empty_cell; i++) 
     {
         cur_value_of_hash = cur_value_of_hash + st->data[i]; 
     }    
@@ -344,7 +350,7 @@ size_t Get_cur_value_of_hash(Stack * st) // OK
     return cur_value_of_hash;
 }
 
-const char* Enum_to_string(size_t code) // CHECK
+const char* Enum_to_string(size_t code) // converts an enum's int value to the enum's string value
 {
     switch(code)
     {
@@ -367,7 +373,7 @@ const char* Enum_to_string(size_t code) // CHECK
             return "ERR_HASH_CHANGED";
             break;
         default:
-            return "OK"; // CHECK
+            return "STACK IS OK"; 
             break;
     }
 }
